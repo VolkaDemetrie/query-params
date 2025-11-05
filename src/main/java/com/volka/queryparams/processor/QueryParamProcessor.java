@@ -9,9 +9,7 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.RecordComponentElement;
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.*;
 import javax.lang.model.util.ElementFilter;
 import java.io.IOException;
 import java.util.*;
@@ -56,8 +54,8 @@ public class QueryParamProcessor extends AbstractProcessor {
                 .returns(mapStringList)
                 .addParameter(TypeName.get(type.asType()), "src")
                 .addStatement("$T map = new $T<>()", mapStringList, linkedHashMapCls);
-
-        for (RecordComponentElement field : ElementFilter.recordComponentsIn(type.getEnclosedElements())) {
+        
+        for (Element field : parseField(type)) {
             String fieldName = field.getSimpleName().toString();
             String key = convertCase(fieldName, caseType);
             // 단일 값만 있다고 가정하고 List<String> 한 칸짜리로 감쌈
@@ -93,6 +91,11 @@ public class QueryParamProcessor extends AbstractProcessor {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private List<? extends Element> parseField(TypeElement type) {
+        if (type.getKind() == ElementKind.RECORD) return ElementFilter.recordComponentsIn(type.getEnclosedElements());
+        return ElementFilter.fieldsIn(type.getEnclosedElements());
     }
 
     private String convertCase(String name, Case targetCase) {
