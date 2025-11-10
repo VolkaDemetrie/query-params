@@ -11,12 +11,13 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.ElementFilter;
 import java.io.IOException;
 import java.util.*;
 
-@SupportedSourceVersion(SourceVersion.RELEASE_21)
-@SupportedAnnotationTypes("volka.queryparams.QueryParams")
+@SupportedSourceVersion(SourceVersion.RELEASE_17)
+@SupportedAnnotationTypes("io.github.volkayun.queryparams.annotations.QueryParams")
 public class QueryParamProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -48,25 +49,45 @@ public class QueryParamProcessor extends AbstractProcessor {
         TypeName listOfString = ParameterizedTypeName.get(listCls, stringCls);
         TypeName mapStringList = ParameterizedTypeName.get(mapCls, stringCls, listOfString);
 
-        // toQueryParams(...)
+        // 공통으로 쓸 프로퍼티 정보 (필드명, 접근식)
+        record Prop(String name, String accessorExpr) {}
+
+        List<Prop> props = new ArrayList<>();
+
+        if (type.getKind() == ElementKind.RECORD) {
+            // record: src.fieldName()
+            for (RecordComponentElement comp
+                    : ElementFilter.recordComponentsIn(type.getEnclosedElements())) {
+                String fieldName = comp.getSimpleName().toString();
+                String accessor = "src." + fieldName + "()";
+                props.add(new Prop(fieldName, accessor));
+            }
+        } else {
+            // class: public getter 기준으로 프로퍼티 추출
+            Map<String, String> getters = findBeanGetters(type);
+            for (Map.Entry<String, String> e : getters.entrySet()) {
+                String fieldName = e.getKey();       // name
+                String getterName = e.getValue();    // getName
+                String accessor = "src." + getterName + "()";
+                props.add(new Prop(fieldName, accessor));
+            }
+        }
+
         MethodSpec.Builder toMap = MethodSpec.methodBuilder("toQueryParams")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(mapStringList)
                 .addParameter(TypeName.get(type.asType()), "src")
                 .addStatement("$T map = new $T<>()", mapStringList, linkedHashMapCls);
-        
-        for (Element field : collectFieldsByType(type)) {
-            String fieldName = field.getSimpleName().toString();
-            String key = CaseConverter.convertCase(fieldName, caseType);
-            // 단일 값만 있다고 가정하고 List<String> 한 칸짜리로 감쌈
+
+        for (Prop p : props) {
+            String key = CaseConverter.convertCase(p.name(), caseType);
             toMap.addStatement(
-                    "map.put($S, $T.of(String.valueOf(src.$L())))",
-                    key, listCls, fieldName
+                    "map.put($S, $T.of(String.valueOf($L)))",
+                    key, listCls, p.accessorExpr()
             );
         }
         toMap.addStatement("return map");
 
-        // toQueryString(...)
         MethodSpec toString = MethodSpec.methodBuilder("toQueryString")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(String.class)
@@ -92,6 +113,40 @@ public class QueryParamProcessor extends AbstractProcessor {
             throw new CaseConvertException("Case converting Exception", e);
         }
     }
+
+    private Map<String, String> findBeanGetters(TypeElement type) {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        for (ExecutableElement method
+                : ElementFilter.methodsIn(type.getEnclosedElements())) {
+
+            Set<Modifier> mods = method.getModifiers();
+            if (!mods.contains(Modifier.PUBLIC) || mods.contains(Modifier.STATIC)) continue;
+            if (!method.getParameters().isEmpty()) continue;
+
+            String name = method.getSimpleName().toString();
+            String propName = null;
+
+            if (name.startsWith("get") && name.length() > 3) {
+                propName = decap(name.substring(3));
+            } else if (name.startsWith("is") && name.length() > 2 &&
+                    method.getReturnType().getKind() == TypeKind.BOOLEAN) {
+                propName = decap(name.substring(2));
+            }
+
+            if (propName != null && !propName.isEmpty()) {
+                result.put(propName, name); // propName -> getterName
+            }
+        }
+        return result;
+    }
+
+    private String decap(String s) {
+        if (s.isEmpty()) return s;
+        if (s.length() == 1) return s.toLowerCase();
+        return Character.toLowerCase(s.charAt(0)) + s.substring(1);
+    }
+
 
     private List<? extends Element> collectFieldsByType(TypeElement type) {
         if (type.getKind() == ElementKind.RECORD) return ElementFilter.recordComponentsIn(type.getEnclosedElements());

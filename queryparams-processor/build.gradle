@@ -9,6 +9,11 @@ repositories {
     mavenCentral()
 }
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
 dependencies {
     implementation project(':queryparams-annotations')
     implementation 'com.squareup:javapoet:1.13.0'
@@ -17,10 +22,14 @@ dependencies {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs += [
-            '-processor', 'io.github.joonho.queryparams.processor.QueryParamsProcessor'
-    ]
+    options.annotationProcessorGeneratedSourcesDirectory = file("$buildDir/generated/sources/annotationProcessor/java/main")
 }
+
+//tasks.withType(JavaCompile).configureEach {
+//    options.compilerArgs += [
+//            '-processor', 'io.github.volkayun.queryparams.processor.QueryParamsProcessor'
+//    ]
+//}
 
 test {
     useJUnitPlatform()

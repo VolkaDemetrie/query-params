@@ -9,10 +9,34 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-//    testImplementation platform('org.junit:junit-bom:5.9.1')
-//    testImplementation 'org.junit.jupiter:junit-jupiter'
+java {
+    withSourcesJar()
+    withJavadocJar()
 }
+
+dependencies {}
+
+//publishing {
+//    publications {
+//        mavenJava(MavenPublication) {
+//            from components.java
+//            pom {
+//                name = 'queryparams-annotations'
+//                description = 'Compile-time query param mapper'
+//                url = 'https://github.com/volka-yun/queryparams'
+//                licenses {
+//                    license {
+//                        name = 'Apache-2.0'
+//                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
+//                    }
+//                }
+//                scm {
+//                    url = 'https://github.com/volka-yun/queryparams'
+//                }
+//            }
+//        }
+//    }
+//}
 
 test {
     useJUnitPlatform()
