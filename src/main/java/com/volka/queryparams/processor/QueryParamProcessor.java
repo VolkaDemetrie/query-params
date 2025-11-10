@@ -3,6 +3,7 @@ package com.volka.queryparams.processor;
 import com.squareup.javapoet.*;
 import com.volka.queryparams.annotations.QueryParams;
 import com.volka.queryparams.annotations.constant.Case;
+import com.volka.queryparams.exception.CaseConvertException;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -20,8 +21,7 @@ public class QueryParamProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for (TypeElement annotation : annotations) {
-            for (TypeElement typeElement :
-                    ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(annotation))) {
+            for (TypeElement typeElement : ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(annotation))) {
                 generateToQueryMethods(typeElement);
             }
         }
@@ -55,9 +55,9 @@ public class QueryParamProcessor extends AbstractProcessor {
                 .addParameter(TypeName.get(type.asType()), "src")
                 .addStatement("$T map = new $T<>()", mapStringList, linkedHashMapCls);
         
-        for (Element field : parseField(type)) {
+        for (Element field : collectFieldsByType(type)) {
             String fieldName = field.getSimpleName().toString();
-            String key = convertCase(fieldName, caseType);
+            String key = CaseConverter.convertCase(fieldName, caseType);
             // 단일 값만 있다고 가정하고 List<String> 한 칸짜리로 감쌈
             toMap.addStatement(
                     "map.put($S, $T.of(String.valueOf(src.$L())))",
@@ -89,93 +89,13 @@ public class QueryParamProcessor extends AbstractProcessor {
         try {
             JavaFile.builder(pkg, generated).build().writeTo(processingEnv.getFiler());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new CaseConvertException("Case converting Exception", e);
         }
     }
 
-    private List<? extends Element> parseField(TypeElement type) {
+    private List<? extends Element> collectFieldsByType(TypeElement type) {
         if (type.getKind() == ElementKind.RECORD) return ElementFilter.recordComponentsIn(type.getEnclosedElements());
         return ElementFilter.fieldsIn(type.getEnclosedElements());
     }
 
-    private String convertCase(String name, Case targetCase) {
-        List<String> words = splitIntoWords(name);
-
-        return switch (targetCase) {
-            case CAMEL -> toCamel(words);
-            case PASCAL -> toPascal(words);
-            case SNAKE -> String.join("_", words);
-            case KEBAB -> String.join("-", words);
-            case UPPER_SNAKE -> String.join("_", words).toUpperCase();
-            case UPPER_KEBAB -> String.join("-", words).toUpperCase();
-        };
-    }
-
-    private List<String> splitIntoWords(String name) {
-        if (name == null || name.isEmpty()) {
-            return List.of();
-        }
-
-        // snake
-        if (name.contains("_")) {
-            String[] arr = name.split("_");
-            List<String> list = new ArrayList<>(arr.length);
-            for (String s : arr) {
-                if (!s.isEmpty()) list.add(s.toLowerCase());
-            }
-            return list;
-        }
-
-        // kebab
-        if (name.contains("-")) {
-            String[] arr = name.split("-");
-            List<String> list = new ArrayList<>(arr.length);
-            for (String s : arr) {
-                if (!s.isEmpty()) list.add(s.toLowerCase());
-            }
-            return list;
-        }
-
-        // camel / Pascal
-        List<String> result = new ArrayList<>();
-        StringBuilder current = new StringBuilder();
-        char[] chars = name.toCharArray();
-
-        for (int i = 0; i < chars.length; i++) {
-            char c = chars[i];
-            if (i > 0 && Character.isUpperCase(c) && !current.isEmpty()) {
-                // 새 토큰 경계
-                result.add(current.toString().toLowerCase());
-                current.setLength(0);
-            }
-            current.append(c);
-        }
-        if (!current.isEmpty()) {
-            result.add(current.toString().toLowerCase());
-        }
-        return result;
-    }
-
-    private String toCamel(List<String> words) {
-        if (words.isEmpty()) return "";
-        StringBuilder sb = new StringBuilder(words.get(0));
-        for (int i = 1; i < words.size(); i++) {
-            sb.append(cap(words.get(i)));
-        }
-        return sb.toString();
-    }
-
-    private String toPascal(List<String> words) {
-        StringBuilder sb = new StringBuilder();
-        for (String w : words) {
-            sb.append(cap(w));
-        }
-        return sb.toString();
-    }
-
-    private String cap(String w) {
-        if (w == null || w.isEmpty()) return "";
-        if (w.length() == 1) return w.toUpperCase();
-        return Character.toUpperCase(w.charAt(0)) + w.substring(1);
-    }
 }
