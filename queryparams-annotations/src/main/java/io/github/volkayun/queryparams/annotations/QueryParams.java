@@ -1,6 +1,6 @@
-package volka.queryparams.annotations;
+package io.github.volkayun.queryparams.annotations;
 
-import volka.queryparams.annotations.constant.Case;
+import io.github.volkayun.queryparams.annotations.constant.Case;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
 }
 
-group = 'io.github.volkademetrie'
+group = 'io.github.volka-yun'
 version = '1.0.0'
 
 repositories {

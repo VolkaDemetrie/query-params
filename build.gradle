@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = 'volka'
+group = 'io.github.volka-yun'
 version = '1.0-SNAPSHOT'
 
 repositories {

@@ -1,6 +1,6 @@
-package volka.queryparams;
+package io.github.volkayun.queryparams.processor;
 
-import volka.queryparams.annotations.constant.Case;
+import io.github.volkayun.queryparams.annotations.constant.Case;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * 케이스 컨버터
  */
-class CaseConverter {
+final class CaseConverter {
     static String convertCase(String name, Case targetCase) {
         List<String> words = splitIntoWords(name);
 

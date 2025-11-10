@@ -1,9 +1,9 @@
-package volka.queryparams;
+package io.github.volkayun.queryparams.processor;
 
 import com.squareup.javapoet.*;
-import volka.queryparams.annotations.QueryParams;
-import volka.queryparams.annotations.constant.Case;
-import volka.queryparams.exception.CaseConvertException;
+import io.github.volkayun.queryparams.annotations.QueryParams;
+import io.github.volkayun.queryparams.annotations.constant.Case;
+import io.github.volkayun.queryparams.exception.CaseConvertException;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
