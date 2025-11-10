@@ -1,4 +1,4 @@
-package com.volka.queryparams.exception;
+package volka.queryparams.exception;
 
 public class CaseConvertException extends RuntimeException {
     public CaseConvertException(String message) {

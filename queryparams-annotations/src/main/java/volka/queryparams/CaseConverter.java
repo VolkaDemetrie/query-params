@@ -1,6 +1,6 @@
-package com.volka.queryparams.processor;
+package volka.queryparams;
 
-import com.volka.queryparams.annotations.constant.Case;
+import volka.queryparams.annotations.constant.Case;
 
 import java.util.ArrayList;
 import java.util.List;

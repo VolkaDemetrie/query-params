@@ -1,6 +1,6 @@
-package com.volka.queryparams.annotations;
+package volka.queryparams.annotations;
 
-import com.volka.queryparams.annotations.constant.Case;
+import volka.queryparams.annotations.constant.Case;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,9 +1,9 @@
-package com.volka.queryparams.processor;
+package volka.queryparams;
 
 import com.squareup.javapoet.*;
-import com.volka.queryparams.annotations.QueryParams;
-import com.volka.queryparams.annotations.constant.Case;
-import com.volka.queryparams.exception.CaseConvertException;
+import volka.queryparams.annotations.QueryParams;
+import volka.queryparams.annotations.constant.Case;
+import volka.queryparams.exception.CaseConvertException;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.*;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_21)
-@SupportedAnnotationTypes("com.volka.queryparams.QueryParams")
+@SupportedAnnotationTypes("volka.queryparams.QueryParams")
 public class QueryParamProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
