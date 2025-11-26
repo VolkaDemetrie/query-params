@@ -1,4 +1,8 @@
 package volka;
 
-public record PriceRange(Double min, Double max) {
+import io.github.volkayun.queryparams.annotations.QueryParams;
+import io.github.volkayun.queryparams.runtime.QueryParamConvertible;
+
+@QueryParams
+public record PriceRange(Double min, Double max) implements QueryParamConvertible {
 }

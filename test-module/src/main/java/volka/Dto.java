@@ -1,9 +1,11 @@
 package volka;
 
-import java.util.List;
-import java.util.Map;
+import io.github.volkayun.queryparams.annotations.CaseStrategy;
+import io.github.volkayun.queryparams.annotations.QueryParams;
+import io.github.volkayun.queryparams.runtime.QueryParamConvertible;
 
-public class Dto {
+@QueryParams(caseStrategy = CaseStrategy.SNAKE)
+public class Dto implements QueryParamConvertible {
     private String name;
     private String mobileNumber;
     private String myEmailTest;
@@ -41,8 +43,4 @@ public class Dto {
                 ", testString='" + testString + '\'' +
                 '}';
     }
-
-//    public Map<String, List<String>> toQueryParams() {
-//        return ;
-//    }
 }

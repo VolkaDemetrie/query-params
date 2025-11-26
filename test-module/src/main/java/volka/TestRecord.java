@@ -2,6 +2,7 @@ package volka;
 
 import io.github.volkayun.queryparams.annotations.CaseStrategy;
 import io.github.volkayun.queryparams.annotations.QueryParams;
+import io.github.volkayun.queryparams.runtime.QueryParamConvertible;
 
 import java.util.List;
 import java.util.Map;
@@ -12,8 +13,5 @@ public record TestRecord(
         String mobileNumber,
         String myEmailTest,
         String testString
-) {
-    public Map<String, List<String>> toQueryParams() {
-        return TestRecord__QParams.toQueryParams(this);
-    }
+) implements QueryParamConvertible {
 }

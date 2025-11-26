@@ -1,6 +1,7 @@
 package volka;
 
 import io.github.volkayun.queryparams.annotations.*;
+import io.github.volkayun.queryparams.runtime.QueryParamConvertible;
 
 import java.util.List;
 
@@ -14,5 +15,5 @@ public record SearchReq(
         List<String> tags,
         @ParamConverter(PriceRangeConv.class)
         PriceRange price
-) {
+) implements QueryParamConvertible {
 }
