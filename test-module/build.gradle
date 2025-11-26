@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+group = 'io.github.volka-yun'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(":queryparams-annotations")
+    implementation project(":queryparams-runtime")
+    annotationProcessor project(":queryparams-processor")
+    compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.15.0'
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}

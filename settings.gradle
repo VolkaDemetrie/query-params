@@ -1,5 +1,6 @@
 rootProject.name = 'query-params'
 include 'queryparams-annotations'
+include 'queryparams-runtime'
 include 'queryparams-processor'
 include 'test-module'
 

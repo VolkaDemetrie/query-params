@@ -1,0 +1,23 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'io.github.volka-yun'
+version = '0.0.1'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+dependencies {
+    compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.15.0'
+}
+
+test {
+    useJUnitPlatform()
+}

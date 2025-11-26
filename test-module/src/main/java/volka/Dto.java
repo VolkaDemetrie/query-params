@@ -1,5 +1,8 @@
 package volka;
 
+import java.util.List;
+import java.util.Map;
+
 public class Dto {
     private String name;
     private String mobileNumber;
@@ -38,4 +41,8 @@ public class Dto {
                 ", testString='" + testString + '\'' +
                 '}';
     }
+
+//    public Map<String, List<String>> toQueryParams() {
+//        return ;
+//    }
 }

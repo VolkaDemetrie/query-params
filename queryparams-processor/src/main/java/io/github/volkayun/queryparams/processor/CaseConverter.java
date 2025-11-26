@@ -1,6 +1,7 @@
 package io.github.volkayun.queryparams.processor;
 
-import io.github.volkayun.queryparams.annotations.constant.Case;
+import io.github.volkayun.queryparams.annotations.CaseStrategy;
+import io.github.volkayun.queryparams.annotations.constant.ParamCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +10,28 @@ import java.util.List;
  * 케이스 컨버터
  */
 final class CaseConverter {
-    static String convertCase(String name, Case targetCase) {
+    static String convertCase(String name, CaseStrategy targetCase) {
+        if (targetCase == CaseStrategy.IDENTITY) {
+            return name;
+        }
+
         List<String> words = splitIntoWords(name);
 
         return switch (targetCase) {
+            case IDENTITY -> name;
+            case CAMEL -> toCamel(words);
+            case PASCAL -> toPascal(words);
+            case SNAKE -> String.join("_", words);
+            case KEBAB -> String.join("-", words);
+            case UPPER_SNAKE -> String.join("_", words).toUpperCase();
+        };
+    }
+
+    @Deprecated
+    static String convertCase(String name, ParamCase targetParamCase) {
+        List<String> words = splitIntoWords(name);
+
+        return switch (targetParamCase) {
             case CAMEL -> toCamel(words);
             case PASCAL -> toPascal(words);
             case SNAKE -> String.join("_", words);

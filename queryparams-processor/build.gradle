@@ -16,13 +16,21 @@ java {
 
 dependencies {
     implementation project(':queryparams-annotations')
+    implementation project(':queryparams-runtime')
     implementation 'com.squareup:javapoet:1.13.0'
+    implementation 'com.google.auto.service:auto-service:1.1.1'
+    annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
+    compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.15.0'
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.annotationProcessorGeneratedSourcesDirectory = file("$buildDir/generated/sources/annotationProcessor/java/main")
+}
+
+tasks.withType(Jar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 //tasks.withType(JavaCompile).configureEach {
